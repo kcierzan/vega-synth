@@ -1,3 +1,5 @@
+// Supersaw Oscillator Controller class
+
 SuperOsc = (function() {
   function SuperOsc(context) {
     this.context = context;
@@ -18,27 +20,27 @@ SuperOsc = (function() {
       return;
     }
     if (time == null) {
-      time = this.context.currentTime
+      time = this.context.currentTime;
     }
     freq = noteToFrequency(note);
     voice = new SuperOscVoice(this.context, freq, this.numSaws, this.detune);
     voice.connect(this.delay.input);
     voice.start(time);
-    return this.voices[note] = voice
+    return this.voices[note] = voice;
   };
 
   SuperOsc.prototype.noteOff = function(note, time) {
     if (this.voices[note] == null) {
       return
-    }
+    };
     if (time == null) {
-      time = this.context.currentTime
+      time = this.context.currentTime;
     }
     this.voices[note].stop(time);
     return delete this.voices[note];
   };
 
-  SuperOsc.prototype.connect = function(targer) {
+  SuperOsc.prototype.connect = function(target) {
     return this.output.connect(target);
   };
 
@@ -46,6 +48,7 @@ SuperOsc = (function() {
 
 })();
 
+// Supersaw Oscillator voice instantiation
 SuperOscVoice = (function() {
   function SuperOscVoice(context, frequency, numSaws, detune) {
     this.context = context;
@@ -60,7 +63,7 @@ SuperOscVoice = (function() {
     this.saws = [];
     var i, saw;
     for (i = 0; i < this.numSaws; i++) {
-      saw =this.context.createOscillator();
+      saw = this.context.createOscillator();
       saw.type = "sawtooth";
       saw.frequency.value = this.frequency;
       saw.detune.value = -this.detune + i * 2 * this.detune / (this.numSaws - 1);
@@ -93,4 +96,43 @@ SuperOscVoice.prototype.connect = function(target) {
 return SuperOscVoice;
 
 })();
+
+// Virtual Keyboard
+Keyboard = (function() {
+  function Keyboard($el, params) {
+    var lowestNote, letters, noteOn, noteOff
+    this.$el = $el;
+    this.lowestNote = params.lowestNote || 48;
+    this.letters = params.letters || "awsedftgyhujkolp;'".split('');
+    this.noteOn = params.noteOn || function(note) { return console.log("noteOn: " + note) };
+    this.noteOff = params.noteOff || function(note) { return console.log("noteOff: " + note) };
+    this.keysPressed = {};
+    this.render();
+    this.bindKeys();
+    this.bindMouse();
+  }
+
+  Keyboard.prototype._noteOn = function(note) {
+    if (note in this.keysPressed) {
+      return;
+    }
+    $(this.$el.find('li').get(note - this.lowestNote)).addClass('active');
+    this.keysPressed[note] = true;
+    return this.noteOn(note);
+  };
+
+  Keyboard.prototype._noteOff = function(note) {
+    if (note in this.keysPressed) {
+      return;
+    }
+    $(this.$el.find('li').get(note - this.lowestNote)).removeClass('active');
+    delete this.keysPressed[note];
+    return this.noteOff(note);
+  };
+
+
+
+
+})
+
 
