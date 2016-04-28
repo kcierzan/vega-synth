@@ -130,9 +130,54 @@ Keyboard = (function() {
     return this.noteOff(note);
   };
 
+  Keyboard.prototype.bindKeys = function() {
+    var binder = function(letter, i) {
+      Mousetrap.bind(letter, (function() {
+        return this._noteOn(this.lowestNote + i);
+      }), 'keydown');
+      return Mousetrap.bind(letter, (function(){
+        return this._noteOff(this.lowestNote + i)
+      }), 'keyup');
+    };
+    for (var i = 0; i < this.letters.length; i++) {
+      letter = this.letters[i];
+      binder(letter, i)
+    }
+    Mousetrap.bind('z', function() {
+      return this.lowestNote -= 12;
+    });
+    return Mousetrap.bind('x', function() {
+      return this.lowestNote += 12;
+    });
+  };
 
+  Keyboard.prototype.bindMouse = function() {
+    return this.$el.find('li').each(function(i, key) {
+      $(key).mousedown(function() {
+        return this._noteOn(this.lowestNote + i);
+      });
+      return $(key).mouseup(function() {
+        return this._noteOff(this.lowestNote + i);
+      });
+    });
+  };
 
+  Keyboard.prototype.render = function() {
+    this.$el.empty();
+    $ul = $("<ul>");
+    for (var i = 0; i < this.letters.length; i++) {
+      letter = this.letters[i];
+      $key = $("<li>" + letter + "</li>");
+      if (i === 1 || i === 3 || i === 6 || i === 8 || i === 10 || i === 13 || i === 15) {
+        $key.addClass('accidental');
+      }
+      $ul.append($key);
+    }
+    return this.$el.append.($ul);
+  };
 
-})
+  return Keyboard;
+
+})();
 
 
