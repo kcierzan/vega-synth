@@ -573,7 +573,7 @@ body {
 }
 .p2 path {
   stroke: none;
-  fill: #c30909;
+  fill: #15efef;
   stroke-weight: .1;
   -webkit-svg-shadow: 0 1px 0 #d9d9d9;
 }
@@ -582,5 +582,5 @@ body {
   -webkit-svg-shadow: 0 1px 0 #d9d9d9;
 }
 .p2 rect {
-  fill: #c30909;
+  fill: #15efef;
 }
